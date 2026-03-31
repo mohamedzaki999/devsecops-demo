@@ -1,23 +1,20 @@
 pipeline {
     agent any
 
-    stages {
+    options {
+        skipDefaultCheckout(true)
+    }
 
+    stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/YOUR_USERNAME/devsecops-demo.git'
+                git branch: 'main', url: 'https://github.com/mohamedzaki999/devsecops-demo.git'
             }
         }
 
-        stage('Install') {
+        stage('Install Dependencies') {
             steps {
                 sh 'npm install'
-            }
-        }
-
-        stage('SonarQube Scan') {
-            steps {
-                sh 'sonar-scanner'
             }
         }
 
@@ -29,13 +26,14 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t devsecops-demo .'
+                sh 'docker build -t devsecops-demo:latest .'
             }
         }
 
         stage('Run App') {
             steps {
-                sh 'docker run -d -p 3000:3000 devsecops-demo'
+                sh 'docker rm -f devsecops-demo-container || true'
+                sh 'docker run -d --name devsecops-demo-container -p 3000:3000 devsecops-demo:latest'
                 sh 'sleep 10'
             }
         }
