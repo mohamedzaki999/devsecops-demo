@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 
 app.get("/", (req, res) => {
-  res.send("Hello Secure World 🚀");
+  res.send("Hello Secure World - Build Trigger Test");
 });
 
 app.listen(3000, () => {
