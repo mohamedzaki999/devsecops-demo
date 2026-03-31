@@ -23,7 +23,19 @@ pipeline {
                 sh 'snyk test || true'
             }
         }
-
+      stage('SonarQube Scan') {
+           steps {
+               withSonarQubeEnv('sonarqube-server') {
+                   sh '''
+                   sonar-scanner \
+                   -Dsonar.projectKey=devsecops-demo \
+                   -Dsonar.sources=. \
+                   -Dsonar.host.url=http://192.168.119.129:9000 \
+                   -Dsonar.login=sqa_2385315ca6318b3c334a0562a029cf70423a1752
+                   '''
+              }
+          }
+     }
         stage('Docker Build') {
             steps {
                 sh 'docker build -t devsecops-demo:latest .'
