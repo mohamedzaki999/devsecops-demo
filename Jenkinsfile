@@ -57,3 +57,10 @@ pipeline {
         }
     }
 }
+stage('Kubernetes Deploy') {
+    steps {
+        sh 'minikube image load devsecops-demo:latest'
+        sh 'kubectl apply -f deployment.yaml'
+        sh 'kubectl apply -f service.yaml'
+    }
+}
