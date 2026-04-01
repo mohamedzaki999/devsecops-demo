@@ -55,8 +55,7 @@ pipeline {
                 sh 'docker run --rm --network host ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://127.0.0.1:3001 || true'
             }
         }
-    }
-}
+    
 stage('Kubernetes Deploy') {
     steps {
         sh 'minikube image load devsecops-demo:latest'
