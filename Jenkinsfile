@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    options {
-        skipDefaultCheckout(true)
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -23,19 +19,19 @@ pipeline {
                 sh 'snyk test || true'
             }
         }
-      stage('SonarQube Scan') {
-           steps {
-               withSonarQubeEnv('sonarqube-server') {
-                   sh '''
-                   sonar-scanner \
-                   -Dsonar.projectKey=devsecops-demo \
-                   -Dsonar.sources=. \
-                   -Dsonar.host.url=http://192.168.119.129:9000 \
-                   -Dsonar.login=sqa_2385315ca6318b3c334a0562a029cf70423a1752
-                   '''
-              }
-          }
-     }
+
+        stage('SonarQube Scan') {
+            steps {
+                sh '''
+                sonar-scanner \
+                -Dsonar.projectKey=devsecops-demo \
+                -Dsonar.sources=. \
+                -Dsonar.host.url=http://192.168.119.129:9000 \
+                -Dsonar.login=sqa_2385315ca6318b3c334a0562a029cf70423a1752
+                '''
+            }
+        }
+
         stage('Docker Build') {
             steps {
                 sh 'docker build -t devsecops-demo:latest .'
@@ -55,11 +51,13 @@ pipeline {
                 sh 'docker run --rm --network host ghcr.io/zaproxy/zaproxy:stable zap-baseline.py -t http://127.0.0.1:3001 || true'
             }
         }
-    
-stage('Kubernetes Deploy') {
-    steps {
-        sh 'minikube image load devsecops-demo:latest'
-        sh 'kubectl apply -f deployment.yaml'
-        sh 'kubectl apply -f service.yaml'
+
+        stage('Kubernetes Deploy') {
+            steps {
+                sh 'minikube image load devsecops-demo:latest'
+                sh 'kubectl apply -f deployment.yaml'
+                sh 'kubectl apply -f service.yaml'
+            }
+        }
     }
 }
